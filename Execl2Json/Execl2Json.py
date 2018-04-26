@@ -4,6 +4,9 @@ import xlrd
 import os
 import json
 
+
+CONST_TITLE_POS = 1
+CONST_TYPE_POS = 2
 CONST_CONTENT_BEGIN = 5
 CONST_EXECL_PATH = "./"
 CONST_OUTPUT_PATH = './ouput'
@@ -79,9 +82,9 @@ def readExecl(filename):
             sheet_name = sheet_name[1:]
         sheet_data = workbook.sheet_by_name(sheet)
         #拿到表头
-        titles = sheet_data.row_values(1) 
+        titles = sheet_data.row_values(CONST_TITLE_POS) 
         #拿到类型
-        types = sheet_data.row_values(2) 
+        types = sheet_data.row_values(CONST_TYPE_POS) 
         findGroup = -1
         find = -1
         
