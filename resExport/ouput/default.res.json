@@ -1,0 +1,80 @@
+{
+    "groups": [
+        {
+            "keys": "loading_json,mainscene_dynamic_ske_json,mainscene_dynamic_tex_json,mainscene_dynamic_tex_png,doc_json,ai_json,content_cn_json,editor_json,mapItem_json,mod_json,npc_json,player_json", 
+            "name": "preload"
+        }, 
+        {
+            "keys": "BattleDialog_exml,BattleUI_exml,CharacterName_exml,ChatBubble_exml,HelpItem_exml,HpBar_exml,MissionItem_exml,public_res_json,ConfirmDialog_exml,MissionComplete_exml,battle_scene_json", 
+            "name": "battle"
+        }, 
+        {
+            "keys": "scene_public_res_json", 
+            "name": "scene_public_res"
+        }, 
+        {
+            "keys": "loginBg_png,loginPlayer_png,public_res_json,scene_public_res_json,input_bg_png,defaultHeadImg_png", 
+            "name": "mainscene"
+        }, 
+        {
+            "keys": "entrance_bg_png,war_female_01_ske_json,war_female_01_tex_json,war_female_01_tex_png,war_male_01_ske_json,war_male_01_tex_json,war_male_01_tex_png,click_json,circle_json", 
+            "name": "entrance"
+        }, 
+        {
+            "keys": "number_bitmap_fnt,level_choose_bg_png", 
+            "name": "level_choose"
+        }, 
+        {
+            "keys": "1_jpg,comic_next_png,comic_skip_png,welcome_mp3", 
+            "name": "comic"
+        }
+    ], 
+    "resources": [
+        {
+            "name": "bird_.png", 
+            "type": "image", 
+            "url": "assets/movieClip/bird.png"
+        }, 
+        {
+            "name": "bird_.json", 
+            "type": "json", 
+            "url": "assets/movieClip/bird.json"
+        }, 
+        {
+            "name": "loginBg_.png", 
+            "type": "image", 
+            "url": "assets/gui/login/loginBg.png"
+        }, 
+        {
+            "name": "fence1_tex_.png", 
+            "type": "image", 
+            "url": "assets/armtrue/fence1_tex.png"
+        }, 
+        {
+            "name": "fence1_ske_.json", 
+            "type": "json", 
+            "url": "assets/armtrue/fence1_ske.json"
+        }, 
+        {
+            "name": "fence1_tex_.json", 
+            "type": "json", 
+            "url": "assets/armtrue/fence1_tex.json"
+        }, 
+        {
+            "name": "number_bitmap_.fnt", 
+            "type": "fnt", 
+            "url": "assets/font/number_bitmap.fnt"
+        }, 
+        {
+            "name": "login_ui_.json", 
+            "subkeys": "shurukuang,touxiangkuang,girl,logo_login,LogBI,DI_denglu,btn_xiao2,btn_notice_anxia,youke,nametiao,db_nameTips,headMask,btn_wechatbig,btn_QQbig,btn_hong_anxia,btn_X-anxia,DI_mingzi,btn_QQbig-anxia,btn_story2,touxiang,btn_xiao_anxia,btn_anxia,db_name,btn_wechatbig-anxia,DI_zhanghao,btn_xiao,btn_X,btn_notice2,QQ,boy,btn_story_anxia,btn_hong,db_loginname,wechat", 
+            "type": "sheet", 
+            "url": "assets/sheet/login_ui.json"
+        }, 
+        {
+            "name": "comic_bgm_.mp3", 
+            "type": "sound", 
+            "url": "assets/sound/comic_bgm.mp3"
+        }
+    ]
+}
