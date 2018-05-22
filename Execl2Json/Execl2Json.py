@@ -10,6 +10,7 @@ CONST_TYPE_POS = 2
 CONST_CONTENT_BEGIN = 5
 CONST_EXECL_PATH = "./"
 CONST_OUTPUT_PATH = './ouput'
+CONST_KEYS_TABLE = ['const']
 
 def readExeclByGroup(findGroup,find,titles,types,sheet_data):
     table = {}
@@ -70,6 +71,7 @@ def readExecl(filename):
     ret = {}
     workbook = xlrd.open_workbook(filename)
     sheet_names= workbook.sheet_names()
+    print(sheet_names)
     declare = {}
     for sheet in sheet_names:
         if sheet == '':
@@ -161,7 +163,9 @@ def readPathFile(filePath):
     for i in range(0,len(listDir)):
         subFilePath = os.path.join(filePath,listDir[i])
         if os.path.isfile(subFilePath):
-            if file_extension(listDir[i]) == '.xlsx' or file_extension(listDir[i]) == '.xls':
+            
+            if (not listDir[i].startswith('~$')) and (file_extension(listDir[i]) == '.xlsx' or file_extension(listDir[i]) == '.xls'):
+                print("导表--->",subFilePath)
                 ret,declare = readExecl(subFilePath)
                 dic_table.update(ret)
                 dic_declare.update(declare)
@@ -178,12 +182,25 @@ def file_extension(path):
 
 
 def getValueByType(value,type1):
+    if value == 'null':
+        return None
     if type1 == "int":
         return int(value)
     if type1 == "float":
         return float(value)
+    if type1 == "bool":
+        if value == "true":
+            return True
+        return False
     if type1 == "array":
-        return json.loads(value)
+        try:
+            lists = json.loads(value)
+            if isinstance(lists,list):
+                return lists
+            return [lists]
+        except ValueError:
+            value = '['+value +']'
+            return json.loads(value)
     if type1 == "json":
         return json.loads(value)
     if type1 == "auto":
@@ -207,6 +224,8 @@ def change_type2str(type1):
         return "any[]"
     if type1 == "json":
         return "{}"
+    if type1 == "bool":
+        return "bool"
     if type1 == "auto":
         return "any"
     return "any" 
