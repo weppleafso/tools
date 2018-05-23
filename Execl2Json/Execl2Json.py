@@ -7,12 +7,13 @@ import json
 
 CONST_TITLE_POS = 1
 CONST_TYPE_POS = 2
+CONST_SUBTYPE_POS = 3
 CONST_CONTENT_BEGIN = 5
 CONST_EXECL_PATH = "./"
 CONST_OUTPUT_PATH = './ouput'
 CONST_KEYS_TABLE = ['const']
 
-def readExeclByGroup(findGroup,find,titles,types,sheet_data):
+def readExeclByGroup(findGroup,find,titles,types,subTypes,sheet_data):
     table = {}
     main_group_col = sheet_data.col_values(findGroup)
     main_col = sheet_data.col_values(find)
@@ -26,14 +27,14 @@ def readExeclByGroup(findGroup,find,titles,types,sheet_data):
                 table[group] = {}
                 id = getValueByType(main_col[i],main_type)
                 table[group][id] = {}
-                for k in range(0,len(content)):
-                    if content[k] != '':
-                        value = getValueByType(content[k],types[k])
+                for k in range(0,len(types)):
+                    if types[k] != '':
+                        value = getValueByType(content[k],types[k],subTypes[k])
                         key = titles[k]
                         table[group][id][key] = value  
     return table
 
-def readExeclByKey(find,titles,types,sheet_data):
+def readExeclByKey(find,titles,types,subTypes,sheet_data):
     table = {}
     main_col = sheet_data.col_values(find)
     main_type = types[find]
@@ -42,25 +43,29 @@ def readExeclByKey(find,titles,types,sheet_data):
         if main_col[i] != "":
             id = getValueByType(main_col[i],main_type)
             table[id] = {}
-            for k in range(0,len(content)):
-                if content[k] != '':
-                    value = getValueByType(content[k],types[k])
+            for k in range(0,len(types)):
+                if types[k] != '':
+                    value = getValueByType(content[k],types[k],subTypes[k])
                     key = titles[k]
                     table[id][key] = value
     return table
 
-def readExeclNoKey(titles,types,sheet_data):
+def readExeclNoKey(titles,types,subTypes,sheet_data):
     table = []
     row_num = sheet_data.nrows
     for i in range(CONST_CONTENT_BEGIN,row_num):
-        content = sheet_data.row_values(CONST_CONTENT_BEGIN)
+        content = sheet_data.row_values(i)
         line = {}
         add = False
-        for i in range(0,len(titles)):
-            add = False
-            if content[i] != "":
-                add = True
-                line[titles[i]] = getValueByType(content[i],types[i])
+        if len(titles) == 1:
+            k = 0
+            table.append(getValueByType(content[k],types[k],subTypes[k]))   
+        else:
+            for k in range(0,len(titles)):
+                add = False
+                if types[k] != "":
+                    add = True
+                    line[titles[k]] = getValueByType(content[k],types[k],subTypes[k])
         if add:
             table.append(line)    
     if len(table) == 1:
@@ -77,7 +82,10 @@ def readExecl(filename):
         if sheet == '':
             continue
         outputs = sheet.split('|')
+        if len(outputs) <= 1:
+            continue
         sheet_name = outputs[0]
+        print("导出子表格-----",sheet_name)
         single = False
         if sheet_name.startswith('#'):
             single = True
@@ -87,6 +95,8 @@ def readExecl(filename):
         titles = sheet_data.row_values(CONST_TITLE_POS) 
         #拿到类型
         types = sheet_data.row_values(CONST_TYPE_POS) 
+        #拿到子类型备注
+        subTypes = sheet_data.row_values(CONST_SUBTYPE_POS)
         findGroup = -1
         find = -1
         
@@ -102,14 +112,14 @@ def readExecl(filename):
         if single:
             if findGroup != -1:
                 if find != -1:
-                    table = readExeclByGroup(findGroup,find,titles,types,sheet_data)
+                    table = readExeclByGroup(findGroup,find,titles,types,subTypes,sheet_data)
                     writeJsonFile(sheet_name+".json",table)
             elif find != -1:
-                table = readExeclByKey(find,titles,types,sheet_data)
+                table = readExeclByKey(find,titles,types,subTypes,sheet_data)
                 writeJsonFile(sheet_name+".json",table)
             else :
                 #都没有找到 为无key文件
-                table = readExeclNoKey(titles,types,sheet_data)
+                table = readExeclNoKey(titles,types,subTypes,sheet_data)
                 writeJsonFile(sheet_name+".json",table)
             continue
 
@@ -165,10 +175,11 @@ def readPathFile(filePath):
         if os.path.isfile(subFilePath):
             
             if (not listDir[i].startswith('~$')) and (file_extension(listDir[i]) == '.xlsx' or file_extension(listDir[i]) == '.xls'):
-                print("导表--->",subFilePath)
+                print("开始导表<<<<<",subFilePath)
                 ret,declare = readExecl(subFilePath)
                 dic_table.update(ret)
                 dic_declare.update(declare)
+                print("导表结束>>>>>",subFilePath)
         if os.path.isdir(subFilePath) and (not listDir[i].startswith('.')):
             ret,declare = readPathFile(subFilePath)
             dic_table.update(ret)
@@ -181,7 +192,7 @@ def file_extension(path):
 
 
 
-def getValueByType(value,type1):
+def getValueByType(value,type1,subType=None):
     if value == 'null':
         return None
     if type1 == "int":
@@ -202,7 +213,21 @@ def getValueByType(value,type1):
             value = '['+value +']'
             return json.loads(value)
     if type1 == "json":
-        return json.loads(value)
+        if subType:
+            tiles = subType.split(',')
+            strs = value.split(';')
+            ret = []
+            for i in range(0,len(strs)):
+                dic = {}
+                contents = strs[i].split(',')
+                for j in range(0,len(tiles)):
+                    print(contents[j])
+                    dic[tiles[j]] = getValueByType(contents[j],"auto",None)
+                ret.append(dic)
+            return ret
+        else:
+            return json.loads(value)
+        
     if type1 == "auto":
         if is_digit(value):
             return int(value)
@@ -211,7 +236,7 @@ def getValueByType(value,type1):
         if is_json(value):
             return json.loads(value)
         return "" + value
-    return "" + value  
+    return str(value)  
     
 def change_type2str(type1):
     if type1 == "int":
@@ -232,18 +257,29 @@ def change_type2str(type1):
     
 def is_json(text):
     try:
-        json_object = json.loads(myjson)
+        json_object = json.loads(text)
     except ValueError:
         return False
     return True
 
 def is_digit(text):
-    ret = "" + text
+    ret = str(text)
+    strs = ret.split('.')
+    if len(strs) == 2:
+        try:
+            if float(ret) == int(strs[0]):
+                return True
+            return False
+        except ValueError:
+            return False
     return ret.isdigit()
 
 def is_num(text):
-    ret = "" + text
-    return ret.isalnum()
+    try:
+        float(text)
+    except ValueError:
+        return False
+    return True
 
 def clearAllJsonFile(filePath):
     if os.path.exists(CONST_OUTPUT_PATH):
