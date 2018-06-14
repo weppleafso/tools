@@ -143,7 +143,7 @@ def writeJsonFile(filename,data):
     filePath = os.path.join(CONST_OUTPUT_PATH,filename)
     if os.path.exists(filePath):
         os.remove(filePath)
-    with open(filePath,'w') as f:
+    with open(filePath,"w", encoding="utf-8") as f:
         f.write(data_str)
 
 
